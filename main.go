@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func main() {
 
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
-	client, err := sarama.NewClient([]string{"localhost:9092"}, config)
+	client, err := sarama.NewClient(strings.Split(brokers, ","), config)
 	if err != nil {
 		log.Fatalf("unable to create kafka client: %q", err)
 		panic(err)

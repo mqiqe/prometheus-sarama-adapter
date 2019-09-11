@@ -15,90 +15,34 @@
 package main
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"flag"
 	"github.com/sirupsen/logrus"
 	"os"
 )
 
 var (
-	kafkaBrokerList   = "127.0.0.1:9092"
-	kafkaTopic        = "metrics"
-	basicAuth         = false
-	basicAuthUsername = ""
-	basicAuthPassword = ""
-	kafkaPartition    = kafka.TopicPartition{
-		Topic:     &kafkaTopic,
-		Partition: kafka.PartitionAny,
-	}
+	brokers               = "127.0.0.1:9092"
+	topics                = "metrics"
+	basicAuth             = false
+	basicAuthUsername     = ""
+	basicAuthPassword     = ""
 	kafkaCompression      = "none"
 	kafkaBatchNumMessages = "10000"
 	serializer            Serializer
 )
 
 func init() {
-	//logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.InfoLevel)
-	if value := os.Getenv("LOG_LEVEL"); value == "" {
-		logrus.SetLevel(parseLogLevel(value))
+
+	flag.StringVar(&brokers, "brokers", "127.0.0.1:9092", "Kafka Address")
+	flag.StringVar(&topics, "topics", "metrics", "Kafka Topics")
+	flag.Parse()
+
+	if value := os.Getenv("KAFKA_BROKERS"); value != "" {
+		brokers = value
 	}
-
-	if value := os.Getenv("KAFKA_BROKER_LIST"); value != "" {
-		kafkaBrokerList = value
-	}
-
-	if value := os.Getenv("KAFKA_TOPIC"); value != "" {
-		kafkaTopic = value
-
-		kafkaPartition = kafka.TopicPartition{
-			Topic:     &kafkaTopic,
-			Partition: kafka.PartitionAny,
-		}
-	}
-
-	if value := os.Getenv("BASIC_AUTH_USERNAME"); value != "" {
-		basicAuth = true
-		basicAuthUsername = value
-	}
-
-	if value := os.Getenv("BASIC_AUTH_PASSWORD"); value != "" {
-		basicAuthPassword = value
-	}
-
-	if value := os.Getenv("KAFKA_COMPRESSION"); value != "" {
-		kafkaCompression = value
-	}
-
-	if value := os.Getenv("KAFKA_BATCH_NUM_MESSAGES"); value != "" {
-		kafkaBatchNumMessages = value
-	}
-
-	var err error
-	serializer, err = parseSerializationFormat(os.Getenv("SERIALIZATION_FORMAT"))
-	if err != nil {
-		logrus.WithError(err).Fatalln("couldn't create a metrics serializer")
-	}
-}
-
-func parseLogLevel(value string) logrus.Level {
-	level, err := logrus.ParseLevel(value)
-
-	if err != nil {
-		logrus.WithField("log-level-value", value).Warningln("invalid log level from env var, using info")
-		return logrus.InfoLevel
-	}
-
-	return level
-}
-
-func parseSerializationFormat(value string) (Serializer, error) {
-	switch value {
-	case "json":
-		return NewJSONSerializer()
-	case "avro-json":
-		return NewAvroJSONSerializer("schemas/metric.avsc")
-	default:
-		logrus.WithField("serialization-format-value", value).Warningln("invalid serialization format, using json")
-		return NewJSONSerializer()
+	if value := os.Getenv("KAFKA_TOPICS"); value != "" {
+		topics = value
 	}
 }

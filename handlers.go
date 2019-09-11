@@ -32,7 +32,7 @@ func receiveHandler(producer sarama.SyncProducer, serializer Serializer) func(c 
 			return
 		}
 		// 发送信息到kafka
-		msg := &sarama.ProducerMessage{Topic: "metrics", Value: sarama.StringEncoder(compressed)}
+		msg := &sarama.ProducerMessage{Topic: topics, Value: sarama.StringEncoder(compressed)}
 		partition, offset, err := producer.SendMessage(msg)
 		if err != nil {
 			logrus.Printf("FAILED to send message: %s\n", err)
