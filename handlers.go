@@ -22,7 +22,7 @@ import (
 	"net/http"
 )
 
-func receiveHandler(producer sarama.SyncProducer, serializer Serializer) func(c *gin.Context) {
+func receiveHandler(producer sarama.SyncProducer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		httpRequestsTotal.Add(float64(1))
 		compressed, err := ioutil.ReadAll(c.Request.Body)

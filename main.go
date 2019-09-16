@@ -60,10 +60,10 @@ func main() {
 		authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
 			basicAuthUsername: basicAuthPassword,
 		}))
-		authorized.POST("/receive", receiveHandler(producer, serializer))
+		authorized.POST("/receive", receiveHandler(producer))
 	} else {
-		r.POST("/receive", receiveHandler(producer, serializer))
+		r.POST("/receive", receiveHandler(producer))
 	}
-
-	r.Run()
+	err = r.Run()
+	logrus.Error(err)
 }

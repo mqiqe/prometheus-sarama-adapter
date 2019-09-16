@@ -21,14 +21,12 @@ import (
 )
 
 var (
-	brokers               = "127.0.0.1:9092"
-	topics                = "metrics"
-	basicAuth             = false
-	basicAuthUsername     = ""
-	basicAuthPassword     = ""
-	kafkaCompression      = "none"
-	kafkaBatchNumMessages = "10000"
-	serializer            Serializer
+	brokers           = "127.0.0.1:9092"
+	topics            = "metrics"
+	basicAuth         = false
+	basicAuthUsername = ""
+	basicAuthPassword = ""
+	serializer        Serializer
 )
 
 func init() {
@@ -37,6 +35,10 @@ func init() {
 
 	flag.StringVar(&brokers, "brokers", "127.0.0.1:9092", "Kafka Address")
 	flag.StringVar(&topics, "topics", "metrics", "Kafka Topics")
+
+	flag.BoolVar(&basicAuth, "basic-auth", false, "Enable Basic Auth")
+	flag.StringVar(&basicAuthUsername, "basic-username", "", "Auth User Name")
+	flag.StringVar(&basicAuthPassword, "basic-password", "", "Auth User Password")
 	flag.Parse()
 
 	if value := os.Getenv("KAFKA_BROKERS"); value != "" {
